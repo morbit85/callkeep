@@ -240,6 +240,18 @@ class FlutterCallkeep extends EventManager {
     return false;
   }
 
+  FutureOr<bool> hasPermissions() async {
+    if (isIOS) {
+      return true;
+    }
+    var resp = await _channel
+        .invokeMethod<bool>('hasPermissions', <String, dynamic>{});
+    if (resp != null) {
+      return resp;
+    }
+    return false;
+  }
+
   Future<bool> hasOutgoingCall() async {
     if (isIOS) {
       return true;
