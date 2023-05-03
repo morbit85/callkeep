@@ -268,11 +268,12 @@ public class VoiceConnectionService extends ConnectionService {
             Log.d(TAG, "makeOngoingCall: Waking up application");
             this.wakeUpApplication(callExtras);
         }
-        if (this.canMakeOutgoingCall() && isReachable) {
+        // Both isAvailable and isReachable are always false here, even in the original version.
+        //if (this.canMakeOutgoingCall() && isReachable) {
             return true;
-        }
-        Log.d(TAG, "makeOngoingCall: not available");
-        return false;
+        //}
+        // Log.d(TAG, "makeOngoingCall: not available");
+        // return false;
     }
 
     private void startForegroundService() {
