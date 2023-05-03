@@ -205,13 +205,13 @@ public class VoiceConnection extends Connection {
                 causeCode = DisconnectCause.MISSED;
                 break;
             default:
+                causeCode = DisconnectCause.UNKNOWN;
                 break;
         }
-        if (causeCode != null) {
-            close(causeCode);
-            if (notify) {
-                sendCallRequestToActivity(ACTION_END_CALL, connectionData);
-            }
+
+        close(causeCode);
+        if (notify) {
+            sendCallRequestToActivity(ACTION_END_CALL, connectionData);
         }
     }
 
