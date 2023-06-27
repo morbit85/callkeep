@@ -71,9 +71,9 @@ import io.wazo.callkeep.utils.ConstraintsMap;
 
 // @see https://github.com/kbagchiGWC/voice-quickstart-android/blob/9a2aff7fbe0d0a5ae9457b48e9ad408740dfb968/exampleConnectionService/src/main/java/com/twilio/voice/examples/connectionservice/VoiceConnectionService.java
 public class VoiceConnectionService extends ConnectionService {
-    private static Boolean isAvailable;
-    private static Boolean isInitialized;
-    private static Boolean isReachable;
+    private static Boolean isAvailable = false;
+    private static Boolean isInitialized = false;
+    private static Boolean isReachable = false;
     private static PhoneAccountHandle phoneAccountHandle = null;
     private static final String TAG = "RNCK:VoiceConnectionService";
     private static final Map<String, VoiceConnection> currentConnections = new HashMap<>();
@@ -114,16 +114,20 @@ public class VoiceConnectionService extends ConnectionService {
     public VoiceConnectionService() {
         super();
         Log.e(TAG, "Constructor");
-        isReachable = false;
-        isInitialized = false;
-        isAvailable = false;
-        currentConnectionService = this;
     }
 
     @Override
     public void onCreate() {
+        Log.e(TAG, "onCreate");
         super.onCreate();
+        currentConnectionService = this;
         checkReachability();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.e(TAG, "onDestroy");
+        super.onDestroy();
     }
 
     public static void setPhoneAccountHandle(PhoneAccountHandle phoneAccountHandle) {
@@ -141,7 +145,7 @@ public class VoiceConnectionService extends ConnectionService {
 
 
     public static void setReachable(Boolean value) {
-        Log.d(TAG, "setReachable");
+        Log.d(TAG, "setReachable: " + (value ? "true" : "false"));
         isReachable = value;
     }
 
@@ -269,11 +273,11 @@ public class VoiceConnectionService extends ConnectionService {
             this.wakeUpApplication(callExtras);
         }
         // Both isAvailable and isReachable are always false here, even in the original version.
-        //if (this.canMakeOutgoingCall() && isReachable) {
+        if (this.canMakeOutgoingCall() && isReachable) {
             return true;
-        //}
-        // Log.d(TAG, "makeOngoingCall: not available");
-        // return false;
+        }
+        Log.d(TAG, "makeOngoingCall: not available");
+        return false;
     }
 
     private void startForegroundService() {
