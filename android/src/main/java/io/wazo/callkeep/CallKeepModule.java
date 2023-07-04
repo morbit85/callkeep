@@ -83,6 +83,7 @@ public class CallKeepModule {
     private boolean isReceiverRegistered = false;
     private VoiceBroadcastReceiver voiceBroadcastReceiver;
     private final List<String> requiredPermissions = new LinkedList<>();
+    private final List<String> additionalPermissions = new LinkedList<>();
     private Activity currentActivity = null;
     private final MethodChannel eventChannel;
 
@@ -149,7 +150,11 @@ public class CallKeepModule {
             }
             break;
             case "requestPermissions": {
-                requestPermissions(new ConstraintsArray(call.argument("additionalPermissions")), result);
+                requestPermissions(result);
+            }
+            break;
+            case "hasPermissions": {
+                hasPermissions(result);
             }
             break;
             case "checkDefaultPhoneAccount": {
@@ -204,10 +209,6 @@ public class CallKeepModule {
                 hasOutgoingCall(result);
             }
             break;
-            case "hasPermissions": {
-                hasPermissions(result);
-            }
-            break;
             case "setAvailable": {
                 setAvailable(call.argument("available"));
                 result.success(null);
@@ -260,6 +261,7 @@ public class CallKeepModule {
             registerEvents();
         }
         setupRequiredPermissions(options);
+        setupAdditionalPermissions(options);
     }
 
     private static boolean setupImpl(Context context, ConstraintsMap options) {
@@ -302,6 +304,13 @@ public class CallKeepModule {
             requiredPermissions.add(Manifest.permission.MANAGE_OWN_CALLS);
         } else {
             requiredPermissions.add(Manifest.permission.CALL_PHONE);
+        }
+    }
+
+    private void setupAdditionalPermissions(ConstraintsMap options) {
+        ConstraintsArray optPermissions = options.getArray("additionalPermissions");
+        for (int i = 0; i < additionalPermissions.size(); i++) {
+            additionalPermissions.add(optPermissions.getString(i));
         }
     }
 
@@ -430,7 +439,7 @@ public class CallKeepModule {
     }
 
 
-    private void requestPermissions(ConstraintsArray additionalPermissions, @NonNull MethodChannel.Result result) {
+    private void requestPermissions(@NonNull MethodChannel.Result result) {
         if (!isConnectionServiceAvailable()) {
             result.error(E_CONNECTION_SERVICE_NOT_AVAILABLE, "ConnectionService not available for this version of Android.", null);
             return;
@@ -443,9 +452,7 @@ public class CallKeepModule {
 
         if (!this.hasPermissions()) {
             List<String> allPermissions = new LinkedList<>(requiredPermissions);
-            for (int i = 0; i < additionalPermissions.size(); i++) {
-                allPermissions.add(additionalPermissions.getString(i));
-            }
+            allPermissions.addAll(additionalPermissions);
             requestPermissions(
                     currentActivity,
                     allPermissions.toArray(new String[0]),
@@ -456,6 +463,11 @@ public class CallKeepModule {
             result.success(true);
         }
     }
+
+    private void hasPermissions(@NonNull MethodChannel.Result result) {
+        result.success(this.hasPermissions());
+    }
+
 
     @SuppressLint("MissingPermission")
     private void checkDefaultPhoneAccount(@NonNull MethodChannel.Result result) {
@@ -576,11 +588,6 @@ public class CallKeepModule {
 
     private void hasOutgoingCall(@NonNull MethodChannel.Result result) {
         result.success(VoiceConnectionService.hasOutgoingCall);
-    }
-
-
-    private void hasPermissions(@NonNull MethodChannel.Result result) {
-        result.success(this.hasPermissions());
     }
 
     private void isCallActive(String uuid, @NonNull MethodChannel.Result result) {
@@ -724,15 +731,17 @@ public class CallKeepModule {
     }
 
     private Boolean hasPermissions() {
-        boolean hasPermissions = true;
-        for (String permission : requiredPermissions) {
+        List<String> allPermissions = new LinkedList<>(requiredPermissions);
+        allPermissions.addAll(additionalPermissions);
+
+        for (String permission : allPermissions) {
             int permissionCheck = ContextCompat.checkSelfPermission(currentActivity, permission);
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                hasPermissions = false;
+                return false;
             }
         }
 
-        return hasPermissions;
+        return true;
     }
 
     private static boolean hasPhoneAccount() {

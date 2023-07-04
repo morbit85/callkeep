@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:js_util';
 
 import 'package:flutter/services.dart';
 
@@ -70,14 +71,6 @@ class FlutterCallkeep extends EventManager {
     }
 
     return false;
-  }
-
-  Future<bool> _hasPhoneAccount() async {
-    final result = await _channel.invokeMethod<bool>(
-      'hasPhoneAccount',
-      <String, dynamic>{},
-    );
-    return result ?? false;
   }
 
   Future<void> displayIncomingCall(
@@ -201,11 +194,8 @@ class FlutterCallkeep extends EventManager {
     if (isIOS) {
       return true;
     }
-    var resp = await _channel.invokeMethod<bool>('hasPhoneAccount', <String, dynamic>{});
-    if (resp != null) {
-      return resp;
-    }
-    return false;
+    var resp = await _channel.invokeMethod<bool>('hasPhoneAccount');
+    return resp ?? false;
   }
 
   Future<bool> hasOutgoingCall() async {
@@ -317,9 +307,8 @@ class FlutterCallkeep extends EventManager {
     if (await hasPermissions()) {
       return true;
     }
-    final additionalPermissions = [];
 
-    return await _checkPhoneAccountPermission(additionalPermissions.cast<String>());
+    return await _requestPermissions();
   }
 
   Future<void> openPhoneAccounts() => _openPhoneAccounts();
@@ -328,30 +317,14 @@ class FlutterCallkeep extends EventManager {
     if (isIOS) {
       return;
     }
-    await _channel.invokeMethod<void>('openPhoneAccounts', <String, dynamic>{});
+    await _channel.invokeMethod<void>('openPhoneAccounts');
   }
 
-  Future<bool> _checkPhoneAccountPermission(List<String>? optionalPermissions) async {
+  Future<bool> _requestPermissions() async {
     if (isIOS) {
       return true;
     }
-
-    var resp = await _channel.invokeMethod<bool>('checkPhoneAccountPermission', <String, dynamic>{
-      'optionalPermissions': optionalPermissions ?? [],
-    });
-    if (resp != null) {
-      return resp;
-    }
-    return false;
-  }
-
-  Future<bool> requestPermissions([List<String>? optionalPermissions]) async {
-    if (isIOS) {
-      return true;
-    }
-    var resp = await _channel.invokeMethod<bool>('requestPermissions', <String, dynamic>{
-      'additionalPermissions': optionalPermissions ?? [],
-    });
+    var resp = await _channel.invokeMethod<bool>('requestPermissions');
     return resp ?? false;
   }
 
