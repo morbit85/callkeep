@@ -293,6 +293,8 @@ public class CallKeepModule {
 
     private void setupRequiredPermissions(ConstraintsMap options) {
         requiredPermissions.add(Manifest.permission.READ_PHONE_STATE);
+        requiredPermissions.add(Manifest.permission.RECORD_AUDIO);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             requiredPermissions.add(Manifest.permission.READ_PHONE_NUMBERS);
         }
