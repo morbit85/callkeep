@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:js_util';
 
 import 'package:flutter/services.dart';
 
@@ -172,7 +171,7 @@ class FlutterCallkeep extends EventManager {
   }
 
   Future<List<String>> activeCalls() async {
-    var resp = await _channel.invokeMethod<List<Object>?>('activeCalls', <String, dynamic>{});
+    var resp = await _channel.invokeMethod<List<Object>?>('activeCalls');
     if (resp != null) {
       var uuids = <String>[];
       resp.forEach((element) {
@@ -188,7 +187,7 @@ class FlutterCallkeep extends EventManager {
   Future<void> endCall(String uuid) async =>
       await _channel.invokeMethod<void>('endCall', <String, dynamic>{'uuid': uuid});
 
-  Future<void> endAllCalls() async => await _channel.invokeMethod<void>('endAllCalls', <String, dynamic>{});
+  Future<void> endAllCalls() async => await _channel.invokeMethod<void>('endAllCalls');
 
   FutureOr<bool> hasPhoneAccount() async {
     if (isIOS) {
@@ -202,11 +201,8 @@ class FlutterCallkeep extends EventManager {
     if (isIOS) {
       return true;
     }
-    var resp = await _channel.invokeMethod<bool>('hasOutgoingCall', <String, dynamic>{});
-    if (resp != null) {
-      return resp;
-    }
-    return false;
+    var resp = await _channel.invokeMethod<bool>('hasOutgoingCall');
+    return resp ?? false;
   }
 
   Future<void> setMutedCall(String uuid, bool shouldMute) async =>
