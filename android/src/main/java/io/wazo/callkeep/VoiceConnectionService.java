@@ -29,8 +29,7 @@ import static io.wazo.callkeep.CallKeepConstants.EXTRA_CALL_UUID;
 import static io.wazo.callkeep.CallKeepConstants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
 import static io.wazo.callkeep.CallKeepConstants.HOLD_SUPPORT_DATA_KEY;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -57,6 +56,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
@@ -496,18 +497,9 @@ public class VoiceConnectionService extends ConnectionService {
     /**
      * https://stackoverflow.com/questions/5446565/android-how-do-i-check-if-activity-is-running
      *
-     * @param context Context
      * @return boolean
      */
-    public static boolean isRunning(Context context) {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
-
-        for (RunningTaskInfo task : tasks) {
-            if (context.getPackageName().equalsIgnoreCase(task.baseActivity.getPackageName()))
-                return true;
-        }
-
-        return false;
+    public static boolean isAppForeground() {
+        return ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED);
     }
 }
