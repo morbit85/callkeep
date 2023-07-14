@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.0.2'
     }
 }
 
@@ -24,12 +24,20 @@ apply plugin: 'com.android.library'
 android {
     compileSdk 33
 
+    namespace 'io.wazo.callkeep'
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         minSdkVersion 23
     }
+
     lintOptions {
         disable 'InvalidPackage'
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
