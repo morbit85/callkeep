@@ -6,6 +6,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -40,7 +42,7 @@ public class UdpLog {
             try
             {
                 String message = (String) msg.obj;
-                byte[] sendBuffer = (message + "\n").getBytes();
+                byte[] sendBuffer = message.getBytes();
                 _udpSocket.send(new DatagramPacket(sendBuffer, sendBuffer.length, _host, PORT));
             }
             catch(Exception e)
@@ -63,7 +65,7 @@ public class UdpLog {
         }
     }
 
-    public static void send(String logMessage) {
+    public static void sendln(@NonNull String tag, @NonNull String logMessage) {
         if (!ENABLED) {
             Log.d(TAG, "Logger isn't enabled, skip message: " + logMessage);
             return;
@@ -74,7 +76,7 @@ public class UdpLog {
         }
 
         Message msg = _instance._handler.obtainMessage();
-        msg.obj = logMessage;
+        msg.obj = tag + ": " + logMessage + '\n';
         _instance._handler.sendMessage(msg);
     }
 }
