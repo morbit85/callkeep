@@ -32,6 +32,8 @@ android {
 
     defaultConfig {
         minSdkVersion 23
+        buildConfigField("String", "UDP_LOG_HOST", "\"192.168.88.17\"") // Set to your DEV IP.
+        buildConfigField("int", "UDP_LOG_PORT", "0") // Set to a correct port number to enable the UDP logging.
     }
 
     lintOptions {

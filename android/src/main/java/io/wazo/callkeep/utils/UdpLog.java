@@ -12,11 +12,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import io.wazo.callkeep.BuildConfig;
+
 public class UdpLog {
 
-    private static final boolean ENABLED = false; // Flag, edit to enable/disable the logger.
-    private static final String HOST = "192.168.88.17";
-    private static final int PORT = 64000;
+    private static final String HOST = BuildConfig.UDP_LOG_HOST;
+    private static final int PORT = BuildConfig.UDP_LOG_PORT;
+    private static boolean isEnabled() { return (PORT > 0); }
 
     private static UdpLog _instance = null;
     private static final String TAG = "RNCK:UdpLog";
@@ -38,6 +40,7 @@ public class UdpLog {
             super.finalize();
         }
 
+        @Override
         public void handleMessage(Message msg) {
             try
             {
@@ -66,7 +69,7 @@ public class UdpLog {
     }
 
     public static void sendln(@NonNull String tag, @NonNull String logMessage) {
-        if (!ENABLED) {
+        if (!isEnabled()) {
             Log.d(TAG, "Logger isn't enabled, skip message: " + logMessage);
             return;
         }
