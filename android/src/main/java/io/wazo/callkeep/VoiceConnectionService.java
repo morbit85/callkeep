@@ -273,8 +273,9 @@ public class VoiceConnectionService extends ConnectionService {
             Log.d(TAG, "makeOngoingCall: Waking up application");
             this.wakeUpApplication(callExtras);
         }
-        // Both isAvailable and isReachable are always false here, even in the original version.
-        if (this.canMakeOutgoingCall() && isReachable) {
+        // Both isAvailable and isReachable are always false here, even in the original
+        // version.
+        if (isAvailable && isReachable) {
             return true;
         }
         Log.d(TAG, "makeOngoingCall: not available");
@@ -375,10 +376,6 @@ public class VoiceConnectionService extends ConnectionService {
     private void checkReachability() {
         sendCallRequestToActivity(ACTION_CHECK_REACHABILITY, null);
         broadcastAction(ACTION_CHECK_REACHABILITY, null);
-    }
-
-    private Boolean canMakeOutgoingCall() {
-        return isAvailable;
     }
 
     private void initConnection(String uuid, VoiceConnection connection, Bundle extras, PhoneAccountHandle accountHandle) {
@@ -495,7 +492,7 @@ public class VoiceConnectionService extends ConnectionService {
     }
 
     /**
-     * https://stackoverflow.com/questions/5446565/android-how-do-i-check-if-activity-is-running
+     * <a href="https://stackoverflow.com/questions/5446565/android-how-do-i-check-if-activity-is-running">Info</a>
      *
      * @return boolean
      */
