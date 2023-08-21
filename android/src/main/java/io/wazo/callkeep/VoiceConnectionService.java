@@ -267,7 +267,7 @@ public class VoiceConnectionService extends ConnectionService {
     }
 
     private boolean wakeAndCheckAvailability(Bundle callExtras, Boolean forceWakeUp) {
-        boolean isRunning = VoiceConnectionService.isRunning(this.getApplicationContext());
+        boolean isRunning = VoiceConnectionService.isAppForeground();
         // Wakeup application if needed
         if (!isRunning || forceWakeUp) {
             Log.d(TAG, "makeOngoingCall: Waking up application");
