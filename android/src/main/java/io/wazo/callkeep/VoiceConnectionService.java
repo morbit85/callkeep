@@ -460,7 +460,7 @@ public class VoiceConnectionService extends ConnectionService {
         }
     }
 
-    private void sendCallRequestToActivity(final String action, @Nullable final HashMap attributeMap) {
+    private void sendCallRequestToActivity(final String action, @Nullable final HashMap<String, Object> attributeMap) {
         new Handler().post(() -> {
             Intent intent = new Intent(action);
             if (attributeMap != null) {
